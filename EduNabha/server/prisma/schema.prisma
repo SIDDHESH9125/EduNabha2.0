@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./edunabha.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   // 'student', 'teacher', 'parent'
+  profile   String?  // JSON string for SQLite compatibility
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  downloads UserDownload[]
+  progress  UserProgress[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String
+  grade       String?
+  duration    Int      // in minutes
+  lessons     Int
+  thumbnailUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  videos     Video[]
+  downloads  UserDownload[]
+  progress   UserProgress[]
+}
+
+model Video {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  duration     Int      // in seconds
+  fileSize     Int      // in bytes
+  fileName     String   // local file name
+  filePath     String   // local storage path
+  mimeType     String
+  quality      String?  // '720p', '1080p', etc.
+  isDownloaded Boolean  @default(false)
+  downloadUrl  String?  // original online URL
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  courseId     String
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  downloads    UserDownload[]
+  progress     UserProgress[]
+}
+
+model UserDownload {
+  id           String   @id @default(cuid())
+  status       String   // 'pending', 'downloading', 'completed', 'failed'
+  progress     Float    @default(0) // 0-100
+  downloadedAt DateTime?
+  fileSizeMB   Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId      String?
+  video        Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  courseId     String?
+  course       Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, videoId])
+}
+
+model UserProgress {
+  id           String   @id @default(cuid())
+  watchTime    Int      @default(0) // in seconds
+  completed    Boolean  @default(false)
+  lastWatched  DateTime @default(now())
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId      String?
+  video        Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  courseId     String?
+  course       Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, videoId])
+}
+
+model OfflineStorage {
+  id           String   @id @default(cuid())
+  totalSize    Int      @default(0) // in bytes
+  usedSize     Int      @default(0) // in bytes
+  videoCount   Int      @default(0)
+  lastCleanup  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

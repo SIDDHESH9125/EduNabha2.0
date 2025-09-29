@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--brand: #0ea5e9;
+}
+
+@layer components {
+	.btn {
+		@apply px-4 py-2 rounded-md bg-sky-600 text-white hover:bg-sky-700 transition;
+	}
+
+	.card {
+		@apply bg-white rounded-lg shadow p-4;
+	}
+
+	/* Chatbot specific styles */
+	.chat-bubble-user {
+		@apply bg-indigo-600 text-white rounded-2xl rounded-br-md px-3 py-2 max-w-[80%] sm:max-w-[70%] text-sm;
+	}
+
+	.chat-bubble-assistant {
+		@apply bg-gray-100 text-gray-800 rounded-2xl rounded-bl-md px-3 py-2 max-w-[80%] sm:max-w-[70%] text-sm;
+	}
+
+	.chat-input {
+		@apply w-full border border-gray-300 rounded-2xl px-4 py-3 pr-12 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-all;
+	}
+
+	.floating-chat-btn {
+		@apply fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-40 flex items-center justify-center active:scale-95;
+	}
+}
+
+@layer utilities {
+	.safe-area-bottom {
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.animate-float {
+		animation: float 3s ease-in-out infinite;
+	}
+
+	@keyframes float {
+		0%, 100% { transform: translateY(0px); }
+		50% { transform: translateY(-10px); }
+	}
+
+	.animate-pulse-subtle {
+		animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	}
+
+	@keyframes pulse-subtle {
+		0%, 100% { opacity: 1; }
+		50% { opacity: .8; }
+	}
+}
